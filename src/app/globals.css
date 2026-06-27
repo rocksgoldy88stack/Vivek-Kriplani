@@ -1,0 +1,101 @@
+@import "tailwindcss";
+
+/* ============================================================================
+   DESIGN TOKENS
+   ========================================================================== */
+:root {
+  --background: #fbfaf7;
+  --surface: #ffffff;
+  --foreground: #1a1a18;
+  --muted: #6b6a65;
+  --border: #ece9e2;
+  --accent: #e8842b;
+  --accent-soft: #fdf1e3;
+  --ring: #e8842b;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0d0d0c;
+    --surface: #161614;
+    --foreground: #f3f1ec;
+    --muted: #9c9a93;
+    --border: #2a2926;
+    --accent: #f59e42;
+    --accent-soft: #211a12;
+    --ring: #f59e42;
+  }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --font-sans: var(--font-geist-sans);
+  --font-serif: var(--font-fraunces);
+  --font-mono: var(--font-geist-mono);
+}
+
+* {
+  border-color: var(--border);
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* Subtle dotted background texture */
+.bg-dotted {
+  background-image: radial-gradient(var(--border) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+/* Marquee for the "featured on" strip */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.animate-marquee {
+  animation: marquee 28s linear infinite;
+}
+.marquee-mask {
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 12%,
+    #000 88%,
+    transparent
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 12%,
+    #000 88%,
+    transparent
+  );
+}
