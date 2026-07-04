@@ -100,11 +100,12 @@ idx = [
     ["G", "Deficiency", "16_Deficiency_Log", "Exception log & severity assessment"],
     ["H", "Remediation", "17_Remediation_Roadmap", "Management action plan & phasing"],
     ["I", "Reporting", "18_Findings_Report", "Findings for audit committee"],
-    ["-", "Reference", "19_Sampling_Guidance", "Sample size reference & tickmark legend"],
+    ["I", "Monitoring", "19_Monitoring_Dashboard", "Continuous monitoring KPIs & metrics"],
+    ["-", "Reference", "20_Sampling_Guidance", "Sample size reference & tickmark legend"],
 ]
 data_rows(ws, 7, idx, start_col=2)
 set_widths(ws, [10, 16, 30, 55], start_col=2)
-note(ws, "B28", "Companion Word deliverables: Scoping_Memorandum.docx, Findings_Report.docx (see grc-workpapers folder).")
+note(ws, "B29", "Companion Word deliverables: Scoping_Memorandum.docx, Findings_Report.docx, AAC_Access_Model_Config_Guide.docx (see grc-workpapers folder).")
 
 # =========================================================
 # TAB: SCOPING MEMO
@@ -612,9 +613,103 @@ data_rows(ws, 5, find, start_col=2, colormap={2:{"Material Weakness":CRIT,"Signi
 set_widths(ws, [4,8,22,16,26,26,22,28,26,24], start_col=1)
 
 # =========================================================
+# TAB: CONTINUOUS MONITORING DASHBOARD
+# =========================================================
+ws = wb.create_sheet("19_Monitoring_Dashboard")
+ws.sheet_properties.tabColor = "1F6E43"
+title_cell(ws, "B2", "CONTINUOUS MONITORING DASHBOARD - AAC / ATC METRICS")
+note(ws, "B3", "Near-real-time KPIs from Oracle AAC/ATC continuous monitoring. Population scanned: 342 users, 9,655 transactions. Refresh: with each data sync.")
+
+# --- Section 1: Headline KPIs ---
+ws.cell(row=5, column=2, value="1. HEADLINE KPIs").font = Font(bold=True, color=NAVY, size=12)
+header_row(ws, 6, ["Metric", "Current", "Prior Period", "Target", "Status"], start_col=2)
+kpis = [
+    ["Total SoD incidents (open)", 64, 78, "< 40", "Off Track"],
+    ["New incidents this period", 9, 15, "Decreasing", "On Track"],
+    ["Incidents closed this period", 23, 12, "Increasing", "On Track"],
+    ["Critical incidents open", 3, 5, "0", "Off Track"],
+    ["High incidents open", 46, 55, "< 20", "Off Track"],
+    ["Avg age of open incidents (days)", 37, 44, "< 30", "Watch"],
+    ["Mean time to remediate (days)", 28, 35, "< 21", "Watch"],
+    ["% incidents with mitigating control", "72%", "60%", "> 90%", "Watch"],
+    ["False positive rate", "11%", "24%", "< 10%", "Watch"],
+    ["Control coverage (processes w/ active controls)", "83%", "70%", "100%", "Watch"],
+    ["Users with conflicts / total users", "64 / 342 (19%)", "78 / 340 (23%)", "< 10%", "Off Track"],
+    ["Overdue remediations", 4, 9, "0", "Off Track"],
+]
+cmap_status = {4: {"Off Track": RED, "Watch": AMBER, "On Track": GREEN}}
+end = data_rows(ws, 7, kpis, start_col=2, colormap=cmap_status)
+set_widths(ws, [4, 44, 16, 16, 14, 12], start_col=1)
+
+# --- Section 2: Incidents by Severity ---
+sr = end + 2
+ws.cell(row=sr, column=2, value="2. INCIDENTS BY SEVERITY (status breakdown)").font = Font(bold=True, color=NAVY, size=12)
+header_row(ws, sr+1, ["Severity", "Open", "In Investigation", "Remediate", "Accepted", "Total"], start_col=2)
+sev = [
+    ["Critical", 3, 0, 3, 0, "=SUM(C{r}:F{r})"],
+    ["High", 24, 12, 8, 2, "=SUM(C{r}:F{r})"],
+    ["Medium", 15, 5, 4, 6, "=SUM(C{r}:F{r})"],
+    ["Low", 2, 0, 0, 3, "=SUM(C{r}:F{r})"],
+]
+srow = sr + 2
+for i, row in enumerate(sev):
+    rr = srow + i
+    for j, val in enumerate(row):
+        if isinstance(val, str) and val.startswith("=SUM"):
+            val = val.replace("{r}", str(rr))
+        c = ws.cell(row=rr, column=2 + j, value=val)
+        c.border = border; c.font = Font(size=10); c.alignment = Alignment(vertical="center")
+        if i % 2 == 1:
+            c.fill = PatternFill("solid", fgColor=GREY)
+    ws.cell(row=rr, column=2).fill = PatternFill("solid", fgColor={0: CRIT, 1: RED, 2: AMBER, 3: LIGHT}[i])
+end2 = srow + len(sev)
+
+# --- Section 3: Incidents by Process ---
+sr3 = end2 + 2
+ws.cell(row=sr3, column=2, value="3. INCIDENTS BY PROCESS").font = Font(bold=True, color=NAVY, size=12)
+header_row(ws, sr3+1, ["Process", "# Incidents", "% of Total", "Top Rule"], start_col=2)
+proc = [
+    ["P2P (Procure-to-Pay)", 23, "36%", "SOD-03 (PO entry/approval)"],
+    ["R2R (Record-to-Report)", 14, "22%", "SOD-28 (JE create/approve)"],
+    ["O2C (Order-to-Cash)", 10, "16%", "SOD-20 (credit memo)"],
+    ["Payroll", 8, "12%", "SOD-38 (ghost employee)"],
+    ["Security / Admin", 5, "8%", "SOD-73 (user admin)"],
+    ["Others", 4, "6%", "Various"],
+]
+end3 = data_rows(ws, sr3+2, proc, start_col=2)
+
+# --- Section 4: Incident Aging ---
+sr4 = end3 + 2
+ws.cell(row=sr4, column=2, value="4. OPEN INCIDENT AGING").font = Font(bold=True, color=NAVY, size=12)
+header_row(ws, sr4+1, ["Age Bucket", "Count", "SLA Breached?"], start_col=2)
+aging = [
+    ["0 - 30 days", 34, "No"],
+    ["31 - 60 days", 18, "Watch"],
+    ["61 - 90 days", 8, "Yes"],
+    ["90+ days", 4, "Yes - escalate"],
+]
+end4 = data_rows(ws, sr4+2, aging, start_col=2, colormap={2: {"Yes": RED, "Yes - escalate": RED, "Watch": AMBER, "No": GREEN}})
+
+# --- Section 5: ATC Transaction Monitoring ---
+sr5 = end4 + 2
+ws.cell(row=sr5, column=2, value="5. ATC TRANSACTION MONITORING (this period)").font = Font(bold=True, color=NAVY, size=12)
+header_row(ws, sr5+1, ["Model", "Txns Flagged", "Confirmed Issues", "Value at Risk (INR)", "Status"], start_col=2)
+atcm = [
+    ["ATC-01 Duplicate Payments", 12, 2, "8,40,000", "Under Recovery"],
+    ["ATC-02 Ghost Vendor (bank match)", 3, 1, "12,00,000", "Investigating"],
+    ["ATC-12 Post-Termination Payments", 5, 3, "2,15,000", "Recovered"],
+    ["ATC-09 Large Manual Journals", 18, 0, "-", "Reviewed - OK"],
+    ["ATC-05 Split Transactions", 7, 2, "1,90,000", "Investigating"],
+]
+end5 = data_rows(ws, sr5+2, atcm, start_col=2, colormap={5: {"Investigating": AMBER, "Under Recovery": AMBER, "Recovered": GREEN, "Reviewed - OK": GREEN}})
+set_widths(ws, [4, 44, 16, 16, 18, 16], start_col=1)
+
+ws.cell(row=end5+2, column=2, value="Note: Metrics illustrate a monthly monitoring cadence. Green=on track, Amber=watch, Red=off track/breach.").font = Font(italic=True, size=9, color="595959")
+
+# =========================================================
 # TAB: SAMPLING GUIDANCE
 # =========================================================
-ws = wb.create_sheet("19_Sampling_Guidance")
+ws = wb.create_sheet("20_Sampling_Guidance")
 ws.sheet_properties.tabColor = "A6A6A6"
 title_cell(ws, "B2", "REFERENCE: SAMPLING GUIDANCE & TICKMARK LEGEND")
 header_row(ws, 4, ["Control Frequency","Approx Population","Suggested Sample Size"], start_col=2)

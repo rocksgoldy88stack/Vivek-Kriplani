@@ -14,10 +14,12 @@ remediation roadmap - plus formatted Word deliverables.
 | `GRC_ITAC_Audit_Workpaper_Package.xlsx` | Multi-tab Excel workbook (20 tabs) with sample data, workings and supporting references |
 | `Scoping_Memorandum.docx` | Formatted Word scoping memo deliverable |
 | `Findings_Report.docx` | Formatted Word findings report (audit committee format) |
+| `AAC_Access_Model_Config_Guide.docx` | Step-by-step Oracle AAC access model build/deploy/monitor guide |
 | `generate_workpapers.py` | Python (openpyxl) script that generates the workbook |
-| `generate_word_docs.py` | Python (python-docx) script that generates the Word docs |
+| `generate_word_docs.py` | Python (python-docx) script that generates scoping memo & findings report |
+| `generate_aac_guide.py` | Python (python-docx) script that generates the AAC config guide |
 
-## Workbook Tabs (20)
+## Workbook Tabs (21)
 
 | Tab | Content |
 |-----|---------|
@@ -40,7 +42,8 @@ remediation roadmap - plus formatted Word deliverables.
 | `16_Deficiency_Log` | Exception log & severity assessment |
 | `17_Remediation_Roadmap` | Phased management action plan |
 | `18_Findings_Report` | Audit committee format findings |
-| `19_Sampling_Guidance` | Sample size reference & tickmark legend |
+| `19_Monitoring_Dashboard` | Continuous monitoring KPIs & metrics (AAC/ATC) |
+| `20_Sampling_Guidance` | Sample size reference & tickmark legend |
 
 ## SoD Ruleset Coverage (87 rules)
 
@@ -58,6 +61,20 @@ new-vendor rushed payment, credit memo spike, invoice sequence anomaly.
 
 ```bash
 pip install openpyxl python-docx
-python generate_workpapers.py   # builds the Excel workbook
-python generate_word_docs.py    # builds the two Word deliverables
+python generate_workpapers.py   # builds the Excel workbook (21 tabs)
+python generate_word_docs.py    # builds scoping memo & findings report
+python generate_aac_guide.py    # builds the AAC access model config guide
 ```
+
+## Continuous Monitoring Dashboard (tab 19)
+
+Five metric sections: headline KPIs (open incidents, MTTR, false-positive rate, control
+coverage), incidents by severity (status breakdown), incidents by process, open-incident
+aging buckets, and ATC transaction monitoring (value at risk). Colour-coded On Track / Watch /
+Off Track.
+
+## AAC Access Model Config Guide
+
+Step-by-step Oracle Advanced Access Controls guide: key concepts, prerequisites, navigation,
+building an access model (worked SOD-01 example), deploying it as a control, managing incident
+statuses, tuning/best practices, a starter set of common conflict models, and troubleshooting.
