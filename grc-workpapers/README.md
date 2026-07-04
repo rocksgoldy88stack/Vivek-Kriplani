@@ -15,9 +15,11 @@ remediation roadmap - plus formatted Word deliverables.
 | `Scoping_Memorandum.docx` | Formatted Word scoping memo deliverable |
 | `Findings_Report.docx` | Formatted Word findings report (audit committee format) |
 | `AAC_Access_Model_Config_Guide.docx` | Step-by-step Oracle AAC access model build/deploy/monitor guide |
+| `GRC_ITAC_Executive_Summary.pptx` | Audit committee slide deck (heat map, findings visuals, remediation timeline) |
 | `generate_workpapers.py` | Python (openpyxl) script that generates the workbook |
 | `generate_word_docs.py` | Python (python-docx) script that generates scoping memo & findings report |
 | `generate_aac_guide.py` | Python (python-docx) script that generates the AAC config guide |
+| `generate_exec_deck.py` | Python (python-pptx) script that generates the executive summary deck |
 
 ## Workbook Tabs (21)
 
@@ -60,11 +62,20 @@ new-vendor rushed payment, credit memo spike, invoice sequence anomaly.
 ## Regenerate
 
 ```bash
-pip install openpyxl python-docx
+pip install openpyxl python-docx python-pptx
 python generate_workpapers.py   # builds the Excel workbook (21 tabs)
 python generate_word_docs.py    # builds scoping memo & findings report
 python generate_aac_guide.py    # builds the AAC access model config guide
+python generate_exec_deck.py    # builds the executive summary PowerPoint deck
 ```
+
+## Executive Summary Deck (PowerPoint)
+
+11-slide audit committee deck: title, executive summary with KPI chips, scope & approach,
+findings rating summary, a risk heat map (likelihood x impact) with findings plotted,
+key findings detail cards, SoD/access analysis with a conflicts-by-process bar chart, a
+continuous-monitoring dashboard snapshot, a phased remediation timeline, recommendations /
+next steps, and a closing slide.
 
 ## Continuous Monitoring Dashboard (tab 19)
 
